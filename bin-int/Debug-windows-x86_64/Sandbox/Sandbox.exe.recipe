@@ -2,10 +2,10 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>D:\CDev\gitclient\bin\x64\Debug\miniGame.dll</FullPath>
+      <FullPath>D:\CDev2\gitclient\bin\x64\Debug\miniGame.dll</FullPath>
     </ProjectOutput>
     <ProjectOutput>
-      <FullPath>D:\CDev\gitclient\bin\Debug-windows-x86_64\Sandbox\Sandbox.exe</FullPath>
+      <FullPath>D:\CDev2\gitclient\bin\Debug-windows-x86_64\Sandbox\Sandbox.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

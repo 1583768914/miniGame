@@ -1,0 +1,25 @@
+-- -- 包含相对解决方案的目录
+-- IncludeDir = {}
+-- IncludeDir["GLFW"] = "Hazel/vendor/GLFW/include"
+-- -- 这个include，相当于把glfw下的premake5.lua内容拷贝到这里
+-- include "Hazel/vendor/GLFW"
+-- project "Hazel"		--Hazel项目
+-- 	location "Hazel"--在sln所属文件夹下的Hazel文件夹
+-- 	kind "SharedLib"--dll动态库
+-- 	-- 包含目录
+-- 	includedirs{
+-- 		"%{prj.name}/src",
+-- 		"%{prj.name}/vendor/spdlog/include",
+-- 		"%{IncludeDir.GLFW}"
+-- 	}
+-- 	-- Hazel链接glfw项目
+-- 	links 
+-- 	{ 
+-- 		"GLFW",
+-- 		"opengl32.lib"
+-- 	}
+-- 	filter "system:windows"
+-- 		defines{
+-- 			"HZ_PLATFORM_WINDOWS",
+-- 			"HZ_ENABLE_ASSERTS"
+-- 		}

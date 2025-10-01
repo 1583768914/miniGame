@@ -1,2 +1,11 @@
-echo -e ".idea/\n.vscode/\nbin/" >> .gitignore
-echo "miniGame/.vs/" >> .gitignore
+.idea/
+.vscode/
+.vs/
+bin/
+bin-int/
+miniGame/.vs/
+Debug-windows-x86_64/
+output/
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
