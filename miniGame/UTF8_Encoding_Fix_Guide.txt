@@ -1,0 +1,36 @@
+# 解决Visual Studio中UTF-8编码问题的配置指南
+
+## 问题分析
+编译错误"Unicode support requires compiling with /utf-8"和警告"该文件包含不能在当前代码页(936)中表示的字符"表明项目需要配置UTF-8编码支持。
+
+## 解决方案
+
+### 方法1：在项目属性中配置
+1. 右键点击项目 -> 属性
+2. 导航到 "配置属性" -> "C/C++" -> "命令行"
+3. 在"其他选项"中添加：`/utf-8`
+4. 点击"应用"和"确定"
+
+### 方法2：创建Directory.Build.props文件
+将以下内容保存为`Directory.Build.props`文件，放在解决方案文件夹下（`d:\CDev\gitclient\miniGame`）：
+
+```xml
+<Project>
+  <PropertyGroup>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredUILang>en-US</PreferredUILang>
+    <!-- 启用UTF-8编码支持 -->
+    <AdditionalOptions>$(AdditionalOptions) /utf-8</AdditionalOptions>
+  </PropertyGroup>
+</Project>
+```
+
+### 方法3：使用.vcxproj文件修改
+如果您熟悉项目文件结构，可以直接编辑`miniGame.vcxproj`和`sandBox.vcxproj`文件，添加UTF-8支持的配置。
+
+## 验证文件编码
+确保您的源文件（特别是包含中文注释的文件）以UTF-8编码保存。在Visual Studio中：
+1. 打开文件
+2. 文件 -> 高级保存选项
+3. 选择"Unicode (UTF-8 带签名) - 代码页 65001"
+4. 保存文件

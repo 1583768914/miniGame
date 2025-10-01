@@ -1,0 +1,2 @@
+echo -e ".idea/\n.vscode/\nbin/" >> .gitignore
+echo "miniGame/.vs/" >> .gitignore

@@ -1,0 +1,8 @@
+<Project>
+  <PropertyGroup>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredUILang>en-US</PreferredUILang>
+    <!-- 启用UTF-8编码支持 -->
+    <AdditionalOptions>$(AdditionalOptions) /utf-8</AdditionalOptions>
+  </PropertyGroup>
+</Project>
