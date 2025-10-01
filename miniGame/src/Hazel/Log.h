@@ -9,6 +9,9 @@
 #include "Core.h"
 #include "spdlog/spdlog.h"
 
+// 显式实例化模板以解决DLL导出警告
+extern template class HAZEL_API std::shared_ptr<spdlog::logger>;
+
 namespace Hazel {
     class HAZEL_API Log {
     public:

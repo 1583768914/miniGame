@@ -30,3 +30,6 @@ namespace Hazel
         s_ClientLogger->set_level(spdlog::level::trace);
     }
 } // namespace Hazel
+
+// 显式实例化模板以解决DLL导出警告
+template class HAZEL_API std::shared_ptr<spdlog::logger>;

@@ -74,5 +74,3 @@ namespace Hazel {
 		Event& m_Event;
 	};
 }
-
-HZ_LOG_FORMAT_CLASS(Hazel::Event)

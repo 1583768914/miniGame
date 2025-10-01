@@ -102,11 +102,3 @@ namespace Hazel {
 }
 
 // Register customized classes to spdlog
-HZ_LOG_FORMAT_CLASS(Hazel::AppTickEvent)
-HZ_LOG_FORMAT_CLASS(Hazel::AppUpdateEvent)
-HZ_LOG_FORMAT_CLASS(Hazel::AppRenderEvent)
-HZ_LOG_FORMAT_CLASS(Hazel::WindowResizedEvent)
-HZ_LOG_FORMAT_CLASS(Hazel::WindowMovedEvent)
-HZ_LOG_FORMAT_CLASS(Hazel::WindowClosedEvent)
-HZ_LOG_FORMAT_CLASS(Hazel::WindowFocusedEvent)
-HZ_LOG_FORMAT_CLASS(Hazel::WindowLostFocusEvent)
