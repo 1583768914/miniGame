@@ -8,12 +8,29 @@
 #include <Hazel.h>
 #include <Hazel/EntryPoint.h>
 
+class ExampleLayer:public Hazel::Layer
+{
+   public:
+     ExampleLayer():Layer("Example"){};
+
+     void  OnUpdate() override
+     {
+          HZ_INFO("ExapleLayer::Update"); //最终会被输出
+     }
+
+     void OnEvent(Hazel::Event& event)override{
+        HZ_TRACE("{0}",event);
+     }
+     
+};
+
 class Sandbox : public Hazel::Application
 {
 public:
     Sandbox()
     {
         // 初始化应用程序
+        PushLayer(new ExampleLayer());
         
     }
 
