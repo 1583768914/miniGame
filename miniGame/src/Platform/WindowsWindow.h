@@ -10,7 +10,7 @@ namespace Hazel {
 		void OnUpdate() override;
 		inline unsigned int GetWidth() const override { return m_Data.Width; }
 		inline unsigned int GetHeight() const override { return m_Data.Height; }
-		// ÉèÖÃApplicationµÄ»Øµ÷º¯Êý
+		// è®¾ç½®Applicationçš„å›žè°ƒå‡½æ•°
 		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;

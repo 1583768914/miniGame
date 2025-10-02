@@ -7,6 +7,9 @@
     <Filter Include="Hazel\Events">
       <UniqueIdentifier>{5DEF92FE-4952-22A3-F2D7-5A59DE19EE25}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Layer">
+      <UniqueIdentifier>{6287950D-CE9B-BDBE-971D-611E03F1B9EF}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Platform">
       <UniqueIdentifier>{2AC788B4-1694-E3BF-3FAD-D1672BD9184E}</UniqueIdentifier>
     </Filter>
@@ -37,6 +40,12 @@
     <ClInclude Include="src\Hazel\Log.h">
       <Filter>Hazel</Filter>
     </ClInclude>
+    <ClInclude Include="src\Layer\Layer.h">
+      <Filter>Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Layer\LayerStack.h">
+      <Filter>Layer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Platform\WindowsWindow.h">
       <Filter>Platform</Filter>
     </ClInclude>
@@ -49,6 +58,9 @@
     </ClCompile>
     <ClCompile Include="src\Hazel\Log.cpp">
       <Filter>Hazel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Layer\LayerStack.cpp">
+      <Filter>Layer</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\WindowsWindow.cpp">
       <Filter>Platform</Filter>

@@ -3,28 +3,29 @@
 #include "Core.h"
 #include "Events/Event.h"
 #include "Window.h"
-
+#include "Layer/LayerStack.h"
+#include "Layer/Layer.h"
 
 namespace Hazel {
-  
-	class HAZEL_API Application
-	{
-	   public:
-		 Application();
-	     virtual ~Application();
+    class HAZEL_API Application
+    {
+    public:
+        Application();
+        virtual ~Application();
 
-		 void Run();
+        void Run();
+        void PushLayer(Layer* layer);
+        void PushOverlay(Layer* layer);
+        void OnEvent(Event& e);
 
-	private:
-	Window* m_Window;
-	bool m_Runing = true;
+    private:
+        Window* m_Window;
+        bool m_Running = true;
+        LayerStack m_LayerStack;
+        bool OnWindowClose(Event& e);
+    };
 
-	};
-
-
-
-
-	//To be defined in CLIENT
-	Application* CreateApplication();
+    //To be defined in CLIENT
+    Application* CreateApplication();
 
 }

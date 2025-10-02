@@ -1,4 +1,3 @@
-// Log.h - Hazel引擎日志系统
 #pragma once
 
 // 为了确保UTF-8编码支持，我们在代码文件中添加必要的编译指令
@@ -9,8 +8,11 @@
 #include "Core.h"
 #include "spdlog/spdlog.h"
 
-// 显式实例化模板以解决DLL导出警告
-extern template class HAZEL_API std::shared_ptr<spdlog::logger>;
+// 移除了冲突的显式实例化模板声明
+
+// 禁用C4251警告：类"std::shared_ptr<spdlog::logger>"需要有dll接口由class"Hazel::Log"的客户端使用
+#pragma warning(push)
+#pragma warning(disable: 4251)
 
 namespace Hazel {
     class HAZEL_API Log {
@@ -28,6 +30,9 @@ namespace Hazel {
     };
 }
 
+// 恢复之前的警告设置
+#pragma warning(pop)
+
 // Core log macros
 // ...是接受函数参数包，__VA_ARGS__转发函数参数包
 #define HZ_CORE_TRACE(...)    ::Hazel::Log::GetCoreLogger()->trace(__VA_ARGS__)
@@ -37,7 +42,8 @@ namespace Hazel {
 //#define HZ_CORE_FATAL(...)    ::Hazel::Log::GetCoreLogger()->fatal(__VA_ARGS__) 
 
 // Client log macros
-#define HZ_TRACE(...)	      ::Hazel::Log::GetClientLogger()->trace(__VA_ARGS__)
-#define HZ_INFO(...)	      ::Hazel::Log::GetClientLogger()->info(__VA_ARGS__)
-#define HZ_WARN(...)	      ::Hazel::Log::GetClientLogger()->warn(__VA_ARGS__)
-#define HZ_ERROR(...)	      ::Hazel::Log::GetClientLogger()->error(__VA_ARGS__)
+#define HZ_TRACE(...)         ::Hazel::Log::GetClientLogger()->trace(__VA_ARGS__)
+#define HZ_INFO(...)          ::Hazel::Log::GetClientLogger()->info(__VA_ARGS__)
+#define HZ_WARN(...)          ::Hazel::Log::GetClientLogger()->warn(__VA_ARGS__)
+#define HZ_ERROR(...)         ::Hazel::Log::GetClientLogger()->error(__VA_ARGS__)
+//#define HZ_FATAL(...)         ::Hazel::Log::GetClientLogger()->fatal(__VA_ARGS__)
