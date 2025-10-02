@@ -63,7 +63,9 @@ project "GLFW"
             "opengl32.lib",
             "gdi32.lib",
             "user32.lib",
-            "kernel32.lib"
+            "kernel32.lib",
+            "ucrt.lib",
+            "msvcrt.lib"
         }
         files {
             "miniGame/Vendor/GLFW/src/win32_*.c",
