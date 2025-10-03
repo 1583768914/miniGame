@@ -8,13 +8,14 @@ namespace Hazel {
     // BIND_EVENT_FN宏定义 - 正确的成员函数绑定语法
     #define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
   
-	Application::Application() {
-	   
-		m_Window = Window::Create(); // 创建窗口实例
+	Application::Application() {	    
+	    m_Window = std::unique_ptr<Window>(Window::Create());
+
+		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
 	}
 
 	Application::~Application() {
-		delete m_Window; // 释放窗口资源
+		// m_Window是std::unique_ptr类型，会自动处理内存释放
 	}
 
 	void Application::PushLayer(Layer* layer){
@@ -31,17 +32,10 @@ namespace Hazel {
 
         dispatcher.Dispatch<WindowClosedEvent>(BIND_EVENT_FN(OnWindowClose));
 
-        for(auto it = m_LayerStack.end();it!=m_LayerStack.begin();){
-              
-            (*--it)->OnEvent(e);
-            
-            if(e.IsHandled()){
-                break;
-            }
-        }
+		HZ_CORE_TRACE("{0}", e.ToString());
     }
 
-    bool Application::OnWindowClose(Event& e) {
+    bool Application::OnWindowClose(WindowClosedEvent& e) {
         m_Running = false;
         return true;
     }
@@ -52,9 +46,6 @@ namespace Hazel {
             // 渲染
             glClearColor(1, 0, 1, 1);
             glClear(GL_COLOR_BUFFER_BIT);
-    
-            for(Layer* layer:m_LayerStack)
-              layer->OnUpdate();
 
             m_Window->OnUpdate(); // 更新glfw
         }

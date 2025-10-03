@@ -74,3 +74,14 @@ namespace Hazel {
 		Event& m_Event;
 	};
 }
+
+// 为Event基类提供fmt库支持，使spdlog能够正确格式化和记录Event类型
+namespace fmt {
+    template <>
+    struct formatter<Hazel::Event> : formatter<std::string> {
+        template <typename FormatContext>
+        auto format(const Hazel::Event& e, FormatContext& ctx) const -> decltype(ctx.out()) {
+            return formatter<std::string>::format(e.ToString(), ctx);
+        }
+    };
+}
