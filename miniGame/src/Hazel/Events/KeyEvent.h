@@ -47,7 +47,8 @@ namespace Hazel {
 		}
 
 		EVENT_CLASS_TYPE(KeyReleased)
-	} // namespace Hazel
+	};
+} // namespace Hazel
 
 // 为Hazel命名空间下的事件类提供fmt库支持
 // 这样可以在spdlog中直接使用这些类对象作为日志参数
