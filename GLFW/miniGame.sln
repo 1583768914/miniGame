@@ -1,17 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 16
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GLFW", "GLFW\GLFW.vcxproj", "{154B857C-0182-860D-AA6E-6C109684020F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GLFW", "GLFW.vcxproj", "{154B857C-0182-860D-AA6E-6C109684020F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Glad", "Glad\Glad.vcxproj", "{BDD6857C-A90D-870D-52FA-6C103E10030F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Glad", "..\Glad\Glad.vcxproj", "{BDD6857C-A90D-870D-52FA-6C103E10030F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "miniGame", "miniGame\miniGame.vcxproj", "{0CF589AE-F8C1-E4B9-21DB-D2610D071A48}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "miniGame", "..\miniGame\miniGame.vcxproj", "{0CF589AE-F8C1-E4B9-21DB-D2610D071A48}"
 	ProjectSection(ProjectDependencies) = postProject
 		{154B857C-0182-860D-AA6E-6C109684020F} = {154B857C-0182-860D-AA6E-6C109684020F}
 		{BDD6857C-A90D-870D-52FA-6C103E10030F} = {BDD6857C-A90D-870D-52FA-6C103E10030F}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sandBox", "sandBox\sandBox.vcxproj", "{F4D16B82-60B1-EA1D-69C9-75F4D527517F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sandBox", "..\sandBox\sandBox.vcxproj", "{F4D16B82-60B1-EA1D-69C9-75F4D527517F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

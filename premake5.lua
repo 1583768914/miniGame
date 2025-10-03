@@ -1,4 +1,3 @@
--- 注意：请使用生成在 vendor/bin/premake 目录下的 miniGame.sln 文件，而不是 miniGame 目录下的旧解决方案
 workspace "miniGame"
 architecture "x64"
 configurations{
@@ -7,37 +6,47 @@ configurations{
     "Dist"
 }
 
--- 
---#region- 创建了一个名为 "miniGame" 的工作区
+-- 创建了一个名为 "miniGame" 的工作区
 -- 指定架构为 x64（64位）
 -- 定义了三种构建配置：Debug（调试）、Release（发布）和 Dist（分发）
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
--- 路径组成解析
--- 1. 1.
---    output/
-   
---    - 这是基础输出目录，所有构建产物都将放置在项目根目录下的 output 文件夹中
--- 2. 2.
---    %{cfg.buildcfg}
-   
---    - Premake 内置变量，表示构建配置类型
---    - 在当前项目中，对应的值可以是 Debug 、 Release 或 Dist （在脚本的 configurations 部分定义）
--- 3. 3.
---    %{cfg.system}
-   
---    - Premake 内置变量，表示目标操作系统
---    - 根据构建环境不同，可能的值包括 windows 、 linux 或 macosx
--- 4. 4.
---    %{cfg.architecture}
-   
---    - Premake 内置变量，表示目标架构
---    - 在当前项目中，固定为 x64 （由 architecture "x64" 配置指定）
 
 -- 定义包含目录
 IncludeDir = {
-    GLFW = "miniGame/Vendor/GLFW/include"
+    GLFW = "miniGame/Vendor/GLFW/include",
+    Glad = "miniGame/Vendor/Glad/include"
 }
+
+-- 定义GLAD库项目
+project "Glad"
+    location "Glad"
+    kind "StaticLib"
+    language "C"
+    staticruntime "off"
+    
+    targetdir (outputdir)
+    objdir ("output/intermediate/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}")
+
+    files {
+        "miniGame/Vendor/Glad/include/glad/glad.h",
+        "miniGame/Vendor/Glad/include/KHR/khrplatform.h",
+        "miniGame/Vendor/Glad/src/glad.c"
+    }
+
+    includedirs {
+        "miniGame/Vendor/Glad/include"
+    }
+
+    filter "system:windows"
+        systemversion "latest"
+        staticruntime "On"
+        defines {
+            "_CRT_SECURE_NO_WARNINGS"
+        }
+
+    filter { "system:windows", "configurations:Release" }
+        buildoptions "/MT"
 
 -- 定义GLFW项目
 project "GLFW"
@@ -160,18 +169,21 @@ project "miniGame" -- 修改为与实际项目名称匹配
     includedirs{
         "miniGame/vendor/spdlog/include",
         "%{IncludeDir.GLFW}",
+        "%{IncludeDir.Glad}",
         "miniGame/src"
     }
     
-    -- 链接GLFW库
+    -- 链接GLFW和Glad库
     links {
         "GLFW",
+        "Glad",
         "opengl32.lib"
     }
     
-    -- 设置GLFW为依赖项，确保先编译GLFW
+    -- 设置依赖项，确保先编译GLFW和Glad
     dependson {
-        "GLFW"
+        "GLFW",
+        "Glad"
     }
     
     -- 添加UTF-8编译选项
@@ -179,11 +191,12 @@ project "miniGame" -- 修改为与实际项目名称匹配
         defines {
             "HZ_PLATFORM_WINDOWS",
             "HZ_BUILD_DLL",
-            "_CRT_SECURE_NO_WARNINGS"
+            "_CRT_SECURE_NO_WARNINGS",
+            "GLFW_INCLUDE_NONE" -- 让GLFW不包含OpenGL
         }
         buildoptions "/utf-8"
         characterset ("Unicode")
-    
+
 project "sandBox" -- 注意大小写
     location "sandBox" -- 正确的项目位置
     kind "ConsoleApp"
@@ -214,5 +227,3 @@ project "sandBox" -- 注意大小写
         }
         buildoptions "/utf-8"
         characterset ("Unicode")
-    
-    -- 其他设置保持不变...

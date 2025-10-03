@@ -1,22 +1,117 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="源文件">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="miniGame">
+      <UniqueIdentifier>{0CF589AE-F8C1-E4B9-21DB-D2610D071A48}</UniqueIdentifier>
     </Filter>
-    <Filter Include="头文件">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    <Filter Include="miniGame\Vendor">
+      <UniqueIdentifier>{C9D128E0-355D-96A4-3E6E-1999AA78F2A4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="资源文件">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="miniGame\Vendor\GLFW">
+      <UniqueIdentifier>{A812AB97-94A1-3461-3DC0-485C292E4507}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="miniGame\Vendor\GLFW\src">
+      <UniqueIdentifier>{BFE4DFC6-AB09-2F47-D454-14D7C0D82D65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\miniGame\Vendor\GLFW\src\internal.h">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\miniGame\Vendor\GLFW\src\null_joystick.h">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\miniGame\Vendor\GLFW\src\null_platform.h">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\miniGame\Vendor\GLFW\src\platform.h">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\miniGame\Vendor\GLFW\src\wgl_context.h">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\miniGame\Vendor\GLFW\src\win32_joystick.h">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\miniGame\Vendor\GLFW\src\win32_platform.h">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\miniGame\Vendor\GLFW\src\win32_thread.h">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\miniGame\Vendor\GLFW\src\win32_time.h">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\miniGame\Vendor\GLFW\src\context.c">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\miniGame\Vendor\GLFW\src\egl_context.c">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\miniGame\Vendor\GLFW\src\init.c">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\miniGame\Vendor\GLFW\src\input.c">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\miniGame\Vendor\GLFW\src\monitor.c">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\miniGame\Vendor\GLFW\src\null_init.c">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\miniGame\Vendor\GLFW\src\null_joystick.c">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\miniGame\Vendor\GLFW\src\null_monitor.c">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\miniGame\Vendor\GLFW\src\null_window.c">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\miniGame\Vendor\GLFW\src\osmesa_context.c">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\miniGame\Vendor\GLFW\src\platform.c">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\miniGame\Vendor\GLFW\src\vulkan.c">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\miniGame\Vendor\GLFW\src\wgl_context.c">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\miniGame\Vendor\GLFW\src\win32_init.c">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\miniGame\Vendor\GLFW\src\win32_joystick.c">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\miniGame\Vendor\GLFW\src\win32_module.c">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\miniGame\Vendor\GLFW\src\win32_monitor.c">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\miniGame\Vendor\GLFW\src\win32_thread.c">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\miniGame\Vendor\GLFW\src\win32_time.c">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\miniGame\Vendor\GLFW\src\win32_window.c">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\miniGame\Vendor\GLFW\src\window.c">
+      <Filter>miniGame\Vendor\GLFW\src</Filter>
+    </ClCompile>
     <ClCompile Include="src\SandboxApp.cpp">
-      <Filter>源文件</Filter>
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
