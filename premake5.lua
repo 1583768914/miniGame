@@ -15,7 +15,8 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 -- 定义包含目录
 IncludeDir = {
     GLFW = "miniGame/Vendor/GLFW/include",
-    Glad = "miniGame/Vendor/Glad/include"
+    Glad = "miniGame/Vendor/Glad/include",
+    imgui = "miniGame/Vendor/imgui"
 }
 
 -- 定义GLAD库项目
@@ -36,6 +37,43 @@ project "Glad"
 
     includedirs {
         "miniGame/Vendor/Glad/include"
+    }
+
+    filter "system:windows"
+        systemversion "latest"
+        staticruntime "On"
+        defines {
+            "_CRT_SECURE_NO_WARNINGS"
+        }
+
+    filter { "system:windows", "configurations:Release" }
+        buildoptions "/MT"
+
+-- 定义ImGui项目
+project "imgui"
+    location "imgui"
+    kind "StaticLib"
+    language "C++"
+    staticruntime "off"
+    
+    targetdir (outputdir)
+    objdir ("output/intermediate/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}")
+
+    files {
+        "miniGame/Vendor/imgui/imgui.cpp",
+        "miniGame/Vendor/imgui/imgui_demo.cpp",
+        "miniGame/Vendor/imgui/imgui_draw.cpp",
+        "miniGame/Vendor/imgui/imgui_tables.cpp",
+        "miniGame/Vendor/imgui/imgui_widgets.cpp",
+        "miniGame/Vendor/imgui/backends/imgui_impl_glfw.cpp",
+        "miniGame/Vendor/imgui/backends/imgui_impl_opengl3.cpp"
+    }
+
+    includedirs {
+        "miniGame/Vendor/imgui",
+        "miniGame/Vendor/imgui/backends",
+        "%{IncludeDir.GLFW}",
+        "%{IncludeDir.Glad}"
     }
 
     filter "system:windows"
@@ -170,6 +208,7 @@ project "miniGame" -- 修改为与实际项目名称匹配
         "miniGame/vendor/spdlog/include",
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.Glad}",
+        "%{IncludeDir.imgui}",
         "miniGame/src"
     }
     
@@ -177,13 +216,15 @@ project "miniGame" -- 修改为与实际项目名称匹配
     links {
         "GLFW",
         "Glad",
-        "opengl32.lib"
+        "opengl32.lib",
+        "imgui"
     }
     
-    -- 设置依赖项，确保先编译GLFW和Glad
+    -- 设置依赖项，确保先编译GLFW、Glad和imgui
     dependson {
         "GLFW",
-        "Glad"
+        "Glad",
+        "imgui"
     }
     
     -- 添加UTF-8编译选项

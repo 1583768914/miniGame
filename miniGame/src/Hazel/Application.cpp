@@ -9,8 +9,12 @@ namespace Hazel {
     // BIND_EVENT_FN宏定义 - 正确的成员函数绑定语法
     #define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
   
+	Application* Application::s_Instance = nullptr;
+
 	Application::Application() {	    
 	    m_Window = std::unique_ptr<Window>(Window::Create());
+
+		s_Instance = this;
 
 		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
 
