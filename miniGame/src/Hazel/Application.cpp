@@ -13,10 +13,12 @@ namespace Hazel {
 	    m_Window = std::unique_ptr<Window>(Window::Create());
 
 		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
+
+	
 	}
 
 	Application::~Application() {
-		// m_Window是std::unique_ptr类型，会自动处理内存释放
+		// m_Window是std::unique_ptr类型，会自动处理 内存释放
 	}
 
 	void Application::PushLayer(Layer* layer){

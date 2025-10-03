@@ -3,6 +3,8 @@
 #include "Hazel/Events/ApplicationEvent.h"
 #include "Hazel/Events/MouseEvent.h"
 
+#include <glad/glad.h>
+
 namespace Hazel {
 	static bool s_GLFWInitialized = false;
 	// 通过WindowsWindow类实现Window接口的工厂方法
@@ -30,11 +32,22 @@ namespace Hazel {
 		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
 		// 设置glfw当前上下文
 		glfwMakeContextCurrent(m_Window);
+
+
 		/*
 	设置窗口关联的用户数据指针。这里GLFW仅做存储，不做任何的特殊处理和应用。
 	window表示操作的窗口句柄。
 	pointer表示用户数据指针。
+	   // 重点在这，在运行时获取OpenGL函数地址并将其保存在函数指针中供以后使用//////////////////////////////////
 */
+        int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+
+		 HZ_CORE_ASSERT(status, "初始化Glad失败");
+
+		 // 测试使用OpenGL函数
+         unsigned int id;
+
+		glGenBuffers(1, &id);
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		SetVSync(true);
 

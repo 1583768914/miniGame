@@ -46,7 +46,7 @@
     <ClInclude Include="src\Layer\LayerStack.h">
       <Filter>Layer</Filter>
     </ClInclude>
-    <ClInclude Include="src\Platform\WindowsWindow.h">
+    <ClInclude Include="src\Platform\Windows\WindowsWindow.h">
       <Filter>Platform</Filter>
     </ClInclude>
     <ClInclude Include="src\Window.h" />
@@ -62,7 +62,7 @@
     <ClCompile Include="src\Layer\LayerStack.cpp">
       <Filter>Layer</Filter>
     </ClCompile>
-    <ClCompile Include="src\Platform\WindowsWindow.cpp">
+    <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp">
       <Filter>Platform</Filter>
     </ClCompile>
     <ClCompile Include="src\hzpch.cpp" />
