@@ -7,6 +7,9 @@
 
 #include <Hazel.h>
 #include <Hazel/EntryPoint.h>
+#include <Input.h>
+#include <Hazel/KeyCodes.h>
+#include <Hazel/Events/KeyEvent.h>
 
 class ExampleLayer:public Hazel::Layer
 {
@@ -15,13 +18,23 @@ class ExampleLayer:public Hazel::Layer
 
      void  OnUpdate() override
      {
-          HZ_INFO("ExapleLayer::Update"); //最终会被输出
+          //HZ_INFO("ExapleLayer::Update"); //最终会被输出
+         if (Hazel::Input::IsKeyPressed(HZ_KEY_A)) {
+             HZ_TRACE("A键按下(poll)");
+         }
      }
 
     
 
      void OnEvent(Hazel::Event& event)override{
-        HZ_TRACE("{0}",event.ToString());
+        //HZ_TRACE("{0}",event.ToString());
+         if (event.GetEventType() == Hazel::EventType::KeyPressed) {
+             Hazel::KeyPressedEvent& e = (Hazel::KeyPressedEvent&)event;
+             if (e.GetKeyCode() == HZ_KEY_A) {// 使用键值，检测A键是否按下
+                 HZ_TRACE("A键按下(event)");
+             }
+             HZ_TRACE("{0}", (char)e.GetKeyCode());
+         }
      }
      
 };
@@ -33,6 +46,7 @@ public:
     {
         // 初始化应用程序
         PushLayer(new ExampleLayer());
+        //PushLayer(new Hazel::DebugLayer()); // 添加调试层
         PushOverlay(new Hazel::ImGuiLayer());// UI层放到最后面显示在屏幕的上方
         
     }

@@ -128,6 +128,7 @@
     <ClInclude Include="src\Hazel\Events\KeyEvent.h" />
     <ClInclude Include="src\Hazel\Events\MouseEvent.h" />
     <ClInclude Include="src\Hazel\ImGui\ImGuiLayer.h" />
+    <ClInclude Include="src\Hazel\KeyCodes.h" />
     <ClInclude Include="src\Hazel\Log.h" />
     <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\Layer\Layer.h" />
