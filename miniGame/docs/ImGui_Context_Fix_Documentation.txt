@@ -1,0 +1,91 @@
+# ImGui上下文错误修复文档
+
+## 问题描述
+在运行项目时，ImGui::GetIO()函数报错："No current context. Did you call ImGui::CreateContext() and ImGui::SetCurrentContext() ?"
+
+## 问题分析
+通过查看代码，发现以下问题：
+1. ImGuiLayer类中在OnAttach()方法正确实现了ImGui上下文的创建和初始化
+2. 但在Application和LayerStack类中，PushLayer和PushOverlay方法只是将Layer指针添加到vector中，**没有调用OnAttach方法**
+3. 这导致ImGuiLayer的OnAttach方法从未被执行，ImGui上下文没有被创建
+4. 因此在调用GetIO()时出现"No current context"错误
+
+## 代码分析
+查看SandboxApp.cpp中的代码：
+```cpp
+class Sandbox : public Hazel::Application
+{
+public:
+    Sandbox()
+    {
+        // 初始化应用程序
+        PushLayer(new ExampleLayer());
+        PushOverlay(new Hazel::ImGuiLayer());// UI层放到最后面显示在屏幕的上方
+    }
+    // ...
+};
+```
+
+查看原始的LayerStack.cpp中的代码：
+```cpp
+void LayerStack::PushLayer(Layer *layer)
+{
+    m_LayerInsert = m_Layers.emplace(m_LayerInsert, layer);
+}
+
+void LayerStack::PushOverlay(Layer *overlay)
+{
+    m_Layers.emplace_back(overlay);
+}
+```
+
+## 解决方案
+修改LayerStack.cpp文件，在PushLayer/PushOverlay和PopLayer/PopOverlay方法中分别添加对OnAttach和OnDetach的调用：
+
+### 修改1：在PushLayer和PushOverlay方法中添加OnAttach调用
+```cpp
+void LayerStack::PushLayer(Layer *layer)
+{
+    m_LayerInsert = m_Layers.emplace(m_LayerInsert, layer);
+    layer->OnAttach();  // 添加这一行
+}
+
+void LayerStack::PushOverlay(Layer *overlay)
+{
+    m_Layers.emplace_back(overlay);
+    overlay->OnAttach();  // 添加这一行
+}
+```
+
+### 修改2：在PopLayer和PopOverlay方法中添加OnDetach调用
+```cpp
+void LayerStack::PopLayer(Layer *layer)
+{
+    auto it = std::find(m_Layers.begin(),m_Layers.end(),layer);
+
+    if( it != m_Layers.end()){
+        layer->OnDetach();  // 添加这一行
+        m_Layers.erase(it);
+        m_LayerInsert--;
+    }
+}
+
+void LayerStack::PopOverlay(Layer* overlay){
+     auto it = std::find(m_Layers.begin(),m_Layers.end(),overlay);
+      
+     if(it!=m_Layers.end()){
+        overlay->OnDetach();  // 添加这一行
+        m_Layers.erase(it);
+     }
+}
+```
+
+## 修复效果
+这些修改确保了：
+1. 当SandboxApp中通过`PushOverlay(new Hazel::ImGuiLayer())`添加ImGuiLayer时，ImGuiLayer的OnAttach方法会被自动调用
+2. ImGui上下文会被正确创建，解决了"No current context"错误
+3. 当图层被移除时，OnDetach方法会被调用，确保ImGui资源被正确清理
+
+这些修改保证了ImGuiLayer的初始化和清理流程完整，应该能解决ImGui相关的崩溃和报错问题。
+
+修改日期：2024-01-28

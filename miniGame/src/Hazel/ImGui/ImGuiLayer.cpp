@@ -7,7 +7,6 @@
 #include "Hazel/Events/KeyEvent.h"
 #include <glad/glad.h>
 #include "../../Vendor/imgui/backends/imgui_impl_glfw.h"
-#include <cstddef> // 用于offsetof宏
 
 // 添加HZ_BIND_EVENT_FN宏定义
 #define HZ_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
@@ -20,17 +19,28 @@ namespace Hazel {
 	ImGuiLayer::~ImGuiLayer()
 	{}
 
-	// 前向声明WindowsWindow类
-	class WindowsWindow;
-
 	void ImGuiLayer::OnAttach()
 {
+    // 创建ImGui上下文
     ImGui::CreateContext();
+    
+    // 设置ImGui样式
     ImGui::StyleColorsDark();
 
+    // 获取ImGui IO
     ImGuiIO& io = ImGui::GetIO();
-    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;     // 光标
-    io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
+    
+    // 设置后端标志
+    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;     // 支持光标
+    io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;     // 支持设置鼠标位置
+    
+    // 禁用多视口功能，避免上下文冲突
+    io.ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
+    
+    // 明确声明使用旧的键盘输入API（KeyMap和KeysDown数组）
+    #ifndef IMGUI_DISABLE_OBSOLETE_KEYIO
+    io.BackendUsingLegacyKeyArrays = -1;
+    #endif
 
     // imgui输入key对应glfw的key，临时的：最终会对应引擎自身的key
     io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;
@@ -55,20 +65,17 @@ namespace Hazel {
     io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
     io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
 
-    // 从Application获取Window对象
-    Application& app = Application::Get();
-    Window& window = app.GetWindow();
+    // 获取GLFW窗口指针并进行安全检查
+    GLFWwindow* window = glfwGetCurrentContext();
+    if (!window) {
+        // 如果窗口不存在，可以考虑使用其他方式获取或者设置一个标志表示ImGui未初始化
+        return;
+    }
 
-    // 安全地获取GLFWwindow指针
-    WindowsWindow* windowsWindow = static_cast<WindowsWindow*>(&window);
-    // 获取WindowsWindow类中的GLFWwindow*成员
-    GLFWwindow* glfwWindow = nullptr;
-    // 使用反射或其他方式获取私有成员
-    // 这里我们使用一个技巧：通过memcpy获取私有成员
-    memcpy(&glfwWindow, reinterpret_cast<char*>(windowsWindow) + offsetof(WindowsWindow, m_Window), sizeof(GLFWwindow*));
-
-    // 设置平台/渲染器
-    ImGui_ImplGlfw_InitForOpenGL(glfwWindow, true);
+    // 初始化GLFW和OpenGL3后端
+    // 设置install_callbacks为false，避免GLFW后端使用新的键盘API
+    // 我们在ImGuiLayer的事件处理函数中使用旧的键盘API（KeyMap和KeysDown）
+    ImGui_ImplGlfw_InitForOpenGL(window, false);
     ImGui_ImplOpenGL3_Init("#version 410");
 }
 
@@ -80,33 +87,37 @@ namespace Hazel {
 	}
 
 	void ImGuiLayer::OnUpdate()
-{
+{    
+    // 获取ImGui IO
     ImGuiIO& io = ImGui::GetIO();
     Application& app = Application::Get();
-    // 添加明确的类型转换解决警告
+    
+    // 设置显示尺寸，添加明确的类型转换解决警告
     io.DisplaySize = ImVec2(static_cast<float>(app.GetWindow().GetWidth()), static_cast<float>(app.GetWindow().GetHeight()));
 
+    // 更新时间
     float time = (float)glfwGetTime();
     io.DeltaTime = m_Time > 0.0f ? (time - m_Time) : (1.0f / 60.0f);
     m_Time = time;
 
-    // 需创建窗口后才执行下面
+    // 开始新的ImGui帧
     ImGui_ImplGlfw_NewFrame();
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
 
+    // 显示ImGui Demo窗口
     static bool show = true;
-    // 显示ImGui Demo
     ImGui::ShowDemoWindow(&show);
     
-    // 确保在渲染前完成所有ImGui的绘制命令
+    // 渲染ImGui内容
     ImGui::Render();
     
-    // 渲染ImGui数据
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    
-    // 确保不启用视口功能，因为这可能导致上下文冲突
-    // 临时禁用多视口功能以避免崩溃
+    // 确保GetDrawData不为空才渲染
+    ImDrawData* drawData = ImGui::GetDrawData();
+    if (drawData) {
+        // 渲染ImGui数据
+        ImGui_ImplOpenGL3_RenderDrawData(drawData);
+    }
 	}
 
 	void ImGuiLayer::OnEvent(Event& event) 

@@ -18,6 +18,8 @@ class ExampleLayer:public Hazel::Layer
           HZ_INFO("ExapleLayer::Update"); //最终会被输出
      }
 
+    
+
      void OnEvent(Hazel::Event& event)override{
         HZ_TRACE("{0}",event.ToString());
      }
