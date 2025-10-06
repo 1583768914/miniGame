@@ -3,7 +3,7 @@
 #include "Hazel/Events/ApplicationEvent.h"
 #include "Hazel/Events/MouseEvent.h"
 #include "Hazel/Events/KeyEvent.h"
-
+#include "Platform/OpenGL/OpenGLContext.h"
 #include <glad/glad.h>
 
 namespace Hazel {
@@ -31,6 +31,11 @@ namespace Hazel {
 		}
 		// // 2.1window创建窗口创建窗口
 		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
+		
+		// 2.2创建OpenGL上下文
+		m_Context = new OpenGLContext(m_Window);
+		m_Context->Init();
+
 		// 设置glfw当前上下文
 		glfwMakeContextCurrent(m_Window);
 
@@ -49,6 +54,12 @@ namespace Hazel {
          unsigned int id;
 
 		glGenBuffers(1, &id);
+
+		/*
+        设置窗口关联的用户数据指针。这里GLFW仅做存储，不做任何的特殊处理和应用。
+        window表示操作的窗口句柄。
+        pointer表示用户数据指针。
+    */
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		SetVSync(true);
 

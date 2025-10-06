@@ -191,7 +191,7 @@ project "GLFW"
 
 project "miniGame" -- 修改为与实际项目名称匹配
     location "miniGame" -- 正确的项目位置
-    kind "SharedLib"
+    kind "StaticLib"
     language "C++"
     targetdir (outputdir)
     objdir ("output/intermediate/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}")
@@ -234,9 +234,9 @@ project "miniGame" -- 修改为与实际项目名称匹配
     filter {"system:windows"}
         defines {
             "HZ_PLATFORM_WINDOWS",
-            "HZ_BUILD_DLL",
             "_CRT_SECURE_NO_WARNINGS",
-            "GLFW_INCLUDE_NONE" -- 让GLFW不包含OpenGL
+            "GLFW_INCLUDE_NONE", -- 让GLFW不包含OpenGL
+            "IMGUI_API=__declspec(dllexport)"
         }
         buildoptions "/utf-8"
         characterset ("Unicode")
@@ -268,7 +268,8 @@ project "sandBox" -- 注意大小写
     filter {"system:windows"}
         defines {
             "HZ_PLATFORM_WINDOWS",
-            "_CRT_SECURE_NO_WARNINGS"
+            "_CRT_SECURE_NO_WARNINGS",
+            "IMGUI_API=__declspec(dllimport)"
         }
         buildoptions "/utf-8"
         characterset ("Unicode")
