@@ -47,6 +47,9 @@ namespace Hazel {
 
     private:
         static Input* s_Instance;
+        
+        // 友元声明：允许WindowsInput访问私有成员
+        friend class WindowsInput;
     };
 
     

@@ -2,16 +2,21 @@
 
 namespace Hazel
 {
-    LayerStack::LayerStack() {
-    
-        m_LayerInsert = m_Layers.begin();
+    LayerStack::LayerStack()
+    {
+
+        m_LayerInsertIndex = 0;
     }
 
     void LayerStack::PushLayer(Layer *layer)
-{
-    m_LayerInsert = m_Layers.emplace(m_LayerInsert, layer);
-    layer->OnAttach();
-}
+    {
+        // m_LayerInsert = m_Layers.emplace(m_LayerInsert, layer);
+        // emplace在vector容器指定位置之前插入一个新的元素。返回插入元素的位置
+        // 插入 1 2 3，vector是 1 2 3
+        m_Layers.emplace(m_Layers.begin() + m_LayerInsertIndex, layer);
+        layer->OnAttach();  // 添加这一行，确保图层被添加时调用OnAttach
+        m_LayerInsertIndex++;
+    }
 
     LayerStack::~LayerStack()
     {
@@ -22,34 +27,35 @@ namespace Hazel
     }
 
     void LayerStack::PushOverlay(Layer *overlay)
-{
-    m_Layers.emplace_back(overlay);
-    overlay->OnAttach();
-}
+    {
+        m_Layers.emplace_back(overlay);
+        overlay->OnAttach();  // 添加这一行，确保覆盖层被添加时调用OnAttach
+    }
 
-/**
- * 从图层栈中移除指定的图层
- * @param layer 要移除的图层指针
- */
+    /**
+     * 从图层栈中移除指定的图层
+     * @param layer 要移除的图层指针
+     */
     void LayerStack::PopLayer(Layer *layer)
     {
-        auto it = std::find(m_Layers.begin(),m_Layers.end(),layer);
+        auto it = std::find(m_Layers.begin(), m_Layers.end(), layer);
 
-        if( it != m_Layers.end()){
-            layer->OnDetach();
+        if (it != m_Layers.end())
+        {
             m_Layers.erase(it);
-            m_LayerInsert--;
+            m_LayerInsertIndex--;
         }
     }
 
-
-    void LayerStack::PopOverlay(Layer* overlay){
-         auto it = std::find(m_Layers.begin(),m_Layers.end(),overlay);
-          
-         if(it!=m_Layers.end()){
-            overlay->OnDetach();
+    void LayerStack::PopOverlay(Layer* overlay)
+    {
+        auto it = std::find(m_Layers.begin(), m_Layers.end(), overlay);
+        
+        if (it != m_Layers.end())
+        {
+            overlay->OnDetach();  // 添加这一行，确保覆盖层被移除时调用OnDetach
             m_Layers.erase(it);
-         }
+        }
     }
 
 }

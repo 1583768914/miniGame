@@ -1,193 +1,145 @@
 #include "ImGuiLayer.h"
-#include "Platform/OpenGL/ImGuiOpenGLRenderer.h"
 #include "GLFW/glfw3.h"
 #include "Hazel/Application.h"
-#include "Hazel/Events/ApplicationEvent.h"
-#include "Hazel/Events/MouseEvent.h"
-#include "Hazel/Events/KeyEvent.h"
 #include <glad/glad.h>
 #include "../../Vendor/imgui/backends/imgui_impl_glfw.h"
+#include "../../Vendor/imgui/backends/imgui_impl_opengl3.h"
 
-// 添加HZ_BIND_EVENT_FN宏定义
-#define HZ_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
-
-namespace Hazel {
-
-	ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer")
-	{}
-
-	ImGuiLayer::~ImGuiLayer()
-	{}
-
-	void ImGuiLayer::OnAttach()
+namespace Hazel
 {
-    // 创建ImGui上下文
-    ImGui::CreateContext();
-    
-    // 设置ImGui样式
-    ImGui::StyleColorsDark();
 
-    // 获取ImGui IO
-    ImGuiIO& io = ImGui::GetIO();
-    
-    // 设置后端标志
-    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;     // 支持光标
-    io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;     // 支持设置鼠标位置
-    
-    // 禁用多视口功能，避免上下文冲突
-    io.ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
-    
-    // 明确声明使用旧的键盘输入API（KeyMap和KeysDown数组）
-    #ifndef IMGUI_DISABLE_OBSOLETE_KEYIO
-    io.BackendUsingLegacyKeyArrays = -1;
-    #endif
+    ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {}
+    ImGuiLayer::~ImGuiLayer() {}
+    // 初始化设置ImGui所有窗口的属性，使ImGui窗口能有停靠、独立的UI窗口特性
+    void ImGuiLayer::OnAttach()
+    {
+        // 不需要手动写ImGui的键值对应GLFW的键值、ImGui接收GLFW窗口事件，ImGui自动完成
+        // Setup Dear ImGui context
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGuiIO &io = ImGui::GetIO();
+        (void)io;
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+        // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;   // Enable Docking
+        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows
+        // io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
+        // io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
-    // imgui输入key对应glfw的key，临时的：最终会对应引擎自身的key
-    io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;
-    io.KeyMap[ImGuiKey_LeftArrow] = GLFW_KEY_LEFT;
-    io.KeyMap[ImGuiKey_RightArrow] = GLFW_KEY_RIGHT;
-    io.KeyMap[ImGuiKey_UpArrow] = GLFW_KEY_UP;
-    io.KeyMap[ImGuiKey_DownArrow] = GLFW_KEY_DOWN;
-    io.KeyMap[ImGuiKey_PageUp] = GLFW_KEY_PAGE_UP;
-    io.KeyMap[ImGuiKey_PageDown] = GLFW_KEY_PAGE_DOWN;
-    io.KeyMap[ImGuiKey_Home] = GLFW_KEY_HOME;
-    io.KeyMap[ImGuiKey_End] = GLFW_KEY_END;
-    io.KeyMap[ImGuiKey_Insert] = GLFW_KEY_INSERT;
-    io.KeyMap[ImGuiKey_Delete] = GLFW_KEY_DELETE;
-    io.KeyMap[ImGuiKey_Backspace] = GLFW_KEY_BACKSPACE;
-    io.KeyMap[ImGuiKey_Space] = GLFW_KEY_SPACE;
-    io.KeyMap[ImGuiKey_Enter] = GLFW_KEY_ENTER;
-    io.KeyMap[ImGuiKey_Escape] = GLFW_KEY_ESCAPE;
-    io.KeyMap[ImGuiKey_A] = GLFW_KEY_A;
-    io.KeyMap[ImGuiKey_C] = GLFW_KEY_C;
-    io.KeyMap[ImGuiKey_V] = GLFW_KEY_V;
-    io.KeyMap[ImGuiKey_X] = GLFW_KEY_X;
-    io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
-    io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
+        // Setup Dear ImGui style
+        ImGui::StyleColorsDark();
+        // ImGui::StyleColorsClassic();
+        //  When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+        ImGuiStyle &style = ImGui::GetStyle();
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            style.WindowRounding = 0.0f;
+            style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+        }
 
-    // 获取GLFW窗口指针并进行安全检查
-    GLFWwindow* window = glfwGetCurrentContext();
-    if (!window) {
-        // 如果窗口不存在，可以考虑使用其他方式获取或者设置一个标志表示ImGui未初始化
-        return;
+        Application &app = Application::Get();
+        GLFWwindow *window = static_cast<GLFWwindow *>(app.GetWindow().GetNativeWindow());
+
+        // Setup Platform/Renderer bindings
+        ImGui_ImplGlfw_InitForOpenGL(window, true);
+        ImGui_ImplOpenGL3_Init("#version 410");
     }
-
-    // 初始化GLFW和OpenGL3后端
-    // 设置install_callbacks为false，避免GLFW后端使用新的键盘API
-    // 我们在ImGuiLayer的事件处理函数中使用旧的键盘API（KeyMap和KeysDown）
-    ImGui_ImplGlfw_InitForOpenGL(window, false);
-    ImGui_ImplOpenGL3_Init("#version 410");
-}
-
-	void ImGuiLayer::OnDetach()
-{
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-	}
-
-	void ImGuiLayer::OnUpdate()
-{    
-    // 获取ImGui IO
-    ImGuiIO& io = ImGui::GetIO();
-    Application& app = Application::Get();
-    
-    // 设置显示尺寸，添加明确的类型转换解决警告
-    io.DisplaySize = ImVec2(static_cast<float>(app.GetWindow().GetWidth()), static_cast<float>(app.GetWindow().GetHeight()));
-
-    // 更新时间
-    float time = (float)glfwGetTime();
-    io.DeltaTime = m_Time > 0.0f ? (time - m_Time) : (1.0f / 60.0f);
-    m_Time = time;
-
-    // 开始新的ImGui帧
-    ImGui_ImplGlfw_NewFrame();
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui::NewFrame();
-
-    // 显示ImGui Demo窗口
-    static bool show = true;
-    ImGui::ShowDemoWindow(&show);
-    
-    // 渲染ImGui内容
-    ImGui::Render();
-    
-    // 确保GetDrawData不为空才渲染
-    ImDrawData* drawData = ImGui::GetDrawData();
-    if (drawData) {
-        // 渲染ImGui数据
-        ImGui_ImplOpenGL3_RenderDrawData(drawData);
+    void ImGuiLayer::OnDetach()
+    {
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
     }
-	}
+    void ImGuiLayer::Begin()
+    {
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+    }
+    void ImGuiLayer::End()
+    {
+        ImGuiIO &io = ImGui::GetIO();
+        Application &app = Application::Get();
+        io.DisplaySize = ImVec2(static_cast<float>(app.GetWindow().GetWidth()), static_cast<float>(app.GetWindow().GetHeight()));
+        // Rendering
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            GLFWwindow *backup_current_context = glfwGetCurrentContext();
+            ImGui::UpdatePlatformWindows();
+            ImGui::RenderPlatformWindowsDefault();
+            glfwMakeContextCurrent(backup_current_context);
+        }
+    }
+    void ImGuiLayer::OnImGuiRender()
+    {
+        // 显示一个示例的停靠窗口
+        static bool dockspaceOpen = true;
+        static bool opt_fullscreen = true;
+        static bool opt_padding = false;
+        static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
 
-	void ImGuiLayer::OnEvent(Event& event) 
-{
-    EventDispatcher dispatcher(event);
-    dispatcher.Dispatch<MouseButtonPressedEvent>(HZ_BIND_EVENT_FN(ImGuiLayer::OnMouseButtonPressedEvent));
-    dispatcher.Dispatch<MouseButtonReleasedEvent>(HZ_BIND_EVENT_FN(ImGuiLayer::OnMouseButtonReleaseEvent));
-    dispatcher.Dispatch<MouseMovedEvent>(HZ_BIND_EVENT_FN(ImGuiLayer::OnMouseMovedEvent));
-    dispatcher.Dispatch<MouseScrolledEvent>(HZ_BIND_EVENT_FN(ImGuiLayer::OnMouseScrolledEvent));
-    dispatcher.Dispatch<KeyPressedEvent>(HZ_BIND_EVENT_FN(ImGuiLayer::OnKeyPressedEvent));
-    dispatcher.Dispatch<KeyReleasedEvent>(HZ_BIND_EVENT_FN(ImGuiLayer::OnKeyReleasedEvent));
-    dispatcher.Dispatch<WindowResizedEvent>(HZ_BIND_EVENT_FN(ImGuiLayer::OnWindowResizedEvent));
-  }
+        // 我们使用 ImGuiWindowFlags_NoDocking 来使主窗口没有标题栏，这是停靠空间所必需的
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+        if (opt_fullscreen)
+        {
+            const ImGuiViewport* viewport = ImGui::GetMainViewport();
+            ImGui::SetNextWindowPos(viewport->WorkPos);
+            ImGui::SetNextWindowSize(viewport->WorkSize);
+            ImGui::SetNextWindowViewport(viewport->ID);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+            window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+            window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+        }
+        else
+        {
+            dockspace_flags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
+        }
 
-	bool ImGuiLayer::OnMouseButtonPressedEvent(MouseButtonPressedEvent& e)
-{
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseDown[e.GetButton()] = true;
-    return false;
-}
+        // 当使用 ImGuiDockNodeFlags_PassthruCentralNode 时，我们希望确保主窗口的填充
+        // 不为零，否则我们无法捕获鼠标点击，这些点击将直接传递到绘图后台。
+        if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
+            window_flags |= ImGuiWindowFlags_NoBackground;
 
-	bool ImGuiLayer::OnMouseButtonReleaseEvent(MouseButtonReleasedEvent& e)
-{
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseDown[e.GetButton()] = false;
-    return false;
-}
+        if (!opt_padding)
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+        ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
+        if (!opt_padding)
+            ImGui::PopStyleVar();
 
-	bool ImGuiLayer::OnMouseMovedEvent(MouseMovedEvent& e)
-{
-    ImGuiIO& io = ImGui::GetIO();
-    io.MousePos = ImVec2(e.GetMouseX(), e.GetMouseY());
-    return false;
-}
+        if (opt_fullscreen)
+            ImGui::PopStyleVar(2);
 
-	bool ImGuiLayer::OnMouseScrolledEvent(MouseScrolledEvent& e)
-{
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseWheelH += e.GetOffsetX();
-    io.MouseWheel += e.GetOffsetY();
-    return false;
-}
+        // 停靠空间
+        ImGuiIO& io = ImGui::GetIO();
+        if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+        {
+            ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+            ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+        }
 
-	bool ImGuiLayer::OnKeyPressedEvent(KeyPressedEvent& e)
-{
-    ImGuiIO& io = ImGui::GetIO();
-    io.KeysDown[e.GetKeyCode()] = true;
+        // 菜单
+        if (ImGui::BeginMenuBar())
+        {
+            if (ImGui::BeginMenu("文件"))
+            {
+                if (ImGui::MenuItem("退出")) dockspaceOpen = false;
+                ImGui::EndMenu();
+            }
+            ImGui::EndMenuBar();
+        }
 
-    io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
-    io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
-    io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
-    io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
+        // 停靠窗口示例
+        ImGui::Begin("窗口 1");
+        ImGui::Text("这是第一个停靠窗口");
+        ImGui::End();
 
-    return false;
-}
+        ImGui::Begin("窗口 2");
+        ImGui::Text("这是第二个停靠窗口");
+        ImGui::End();
 
-	bool ImGuiLayer::OnKeyReleasedEvent(KeyReleasedEvent& e)
-{
-    ImGuiIO& io = ImGui::GetIO();
-    io.KeysDown[e.GetKeyCode()] = false;
-    return false;
-}
-
-
-bool ImGuiLayer::OnWindowResizedEvent(WindowResizedEvent& e)
-{
-    ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = ImVec2(static_cast<float>(e.GetWidth()), static_cast<float>(e.GetHeight()));
-    io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
-    glViewport(0, 0, e.GetWidth(), e.GetHeight());
-    return false;
-}
+        ImGui::End();
+    }
 }

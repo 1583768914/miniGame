@@ -16,7 +16,8 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 IncludeDir = {
     GLFW = "miniGame/Vendor/GLFW/include",
     Glad = "miniGame/Vendor/Glad/include",
-    imgui = "miniGame/Vendor/imgui"
+    imgui = "miniGame/Vendor/imgui",
+    glm = "miniGame/Vendor/glm",
 }
 
 -- 定义GLAD库项目
@@ -73,7 +74,8 @@ project "imgui"
         "miniGame/Vendor/imgui",
         "miniGame/Vendor/imgui/backends",
         "%{IncludeDir.GLFW}",
-        "%{IncludeDir.Glad}"
+        "%{IncludeDir.Glad}",
+        "%{IncludeDir.glm}"
     }
 
     filter "system:windows"
@@ -209,6 +211,7 @@ project "miniGame" -- 修改为与实际项目名称匹配
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.Glad}",
         "%{IncludeDir.imgui}",
+        "%{IncludeDir.glm}", -- 添加glm包含目录
         "miniGame/src"
     }
     
@@ -253,7 +256,8 @@ project "sandBox" -- 注意大小写
     
     includedirs{
         "miniGame/vendor/spdlog/include",
-        "miniGame/src"
+        "miniGame/src",
+        "%{IncludeDir.glm}" -- 添加glm包含目录
     }
     
     links{

@@ -6,6 +6,7 @@
 #include "Window.h"
 #include "Layer/LayerStack.h"
 #include "Layer/Layer.h"
+#include "ImGui/ImGuiLayer.h"
 #include <memory>
 
 // 禁用C4251警告：类"std::unique_ptr<Hazel::Window,std::default_delete<Hazel::Window>>"需要有dll接口由class"Hazel::Application"的客户端使用
@@ -32,14 +33,15 @@ namespace Hazel {
 
     private:
         std::unique_ptr<Window> m_Window;
+        ImGuiLayer* m_ImGuiLayer; // 拥有ImGuiLayer控制权
         bool m_Running = true;
         LayerStack m_LayerStack;
-        bool OnWindowClose(WindowClosedEvent& e);
+        bool OnWindowClose(WindowClosedEvent& e); // 处理窗口关闭事件的函数
 
-	private:
-	   
-	    static Application* s_Instance;
+        static Application* s_Instance;
     };
+
+
 
 
 

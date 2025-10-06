@@ -7,6 +7,15 @@ namespace Hazel {
 	class WindowsInput :public Input {
 		
 
+	public:
+		// 用于测试GLFW键盘状态的方法
+		HAZEL_API void TestGLFWKeyState();
+		
+		// 静态方法：获取WindowsInput实例
+		static WindowsInput* Get() {
+			return static_cast<WindowsInput*>(Input::s_Instance);
+		}
+
 	protected:
 		virtual bool IsKeyPressedImpl(int keycode) override;
 
