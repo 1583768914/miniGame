@@ -137,6 +137,7 @@
     <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\Renderer\GraphicsContext.h" />
+    <ClInclude Include="src\Renderer\Shader.h" />
     <ClInclude Include="src\Window.h" />
     <ClInclude Include="src\hzpch.h" />
   </ItemGroup>
@@ -150,6 +151,7 @@
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="src\hzpch.cpp" />
+    <ClCompile Include="src\Renderer\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GLFW\GLFW.vcxproj">
