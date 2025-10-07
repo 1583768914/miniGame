@@ -121,72 +121,28 @@ namespace Hazel
     }
     void ImGuiLayer::OnImGuiRender()
     {
-        // 显示一个示例的停靠窗口
-        static bool dockspaceOpen = true;
-        static bool opt_fullscreen = true;
-        static bool opt_padding = false;
-        static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
-
-        // 我们使用 ImGuiWindowFlags_NoDocking 来使主窗口没有标题栏，这是停靠空间所必需的
-        ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-        if (opt_fullscreen)
-        {
-            const ImGuiViewport* viewport = ImGui::GetMainViewport();
-            ImGui::SetNextWindowPos(viewport->WorkPos);
-            ImGui::SetNextWindowSize(viewport->WorkSize);
-            ImGui::SetNextWindowViewport(viewport->ID);
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-            window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-            window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-        }
-        else
-        {
-            dockspace_flags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
-        }
-
-        // 当使用 ImGuiDockNodeFlags_PassthruCentralNode 时，我们希望确保主窗口的填充
-        // 不为零，否则我们无法捕获鼠标点击，这些点击将直接传递到绘图后台。
-        if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
-            window_flags |= ImGuiWindowFlags_NoBackground;
-
-        if (!opt_padding)
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-        ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
-        if (!opt_padding)
-            ImGui::PopStyleVar();
-
-        if (opt_fullscreen)
-            ImGui::PopStyleVar(2);
-
-        // 停靠空间
-        ImGuiIO& io = ImGui::GetIO();
-        if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
-        {
-            ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-            ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
-        }
-
-        // 菜单
-        if (ImGui::BeginMenuBar())
+        // 移除停靠空间功能，使用普通独立窗口
+        static bool appOpen = true;
+        
+        // 创建主菜单窗口（可选显示）
+        if (ImGui::BeginMainMenuBar())
         {
             if (ImGui::BeginMenu("文件"))
             {
-                if (ImGui::MenuItem("退出")) dockspaceOpen = false;
+                if (ImGui::MenuItem("退出")) appOpen = false;
                 ImGui::EndMenu();
             }
-            ImGui::EndMenuBar();
+            ImGui::EndMainMenuBar();
         }
 
-        // 停靠窗口示例
+        // 创建普通独立窗口 1
         ImGui::Begin("窗口 1");
-        ImGui::Text("这是第一个停靠窗口");
+        ImGui::Text("这是第一个独立窗口");
         ImGui::End();
 
+        // 创建普通独立窗口 2
         ImGui::Begin("窗口 2");
-        ImGui::Text("这是第二个停靠窗口");
-        ImGui::End();
-
+        ImGui::Text("这是第二个独立窗口");
         ImGui::End();
     }
 }
