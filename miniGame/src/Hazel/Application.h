@@ -8,7 +8,9 @@
 #include "Layer/Layer.h"
 #include "ImGui/ImGuiLayer.h"
 #include "Renderer/Shader.h"
+
 #include <memory>
+#include <Platform/OpenGL/OpenGLBuffer.h>
 
 // 禁用C4251警告：类"std::unique_ptr<Hazel::Window,std::default_delete<Hazel::Window>>"需要有dll接口由class"Hazel::Application"的客户端使用
 #pragma warning(push)
@@ -44,6 +46,11 @@ namespace Hazel {
         std::unique_ptr<Shader> m_Shader;
         
         unsigned int  m_VertexArray, m_VertexBuffer, m_IndexBuffer;
+
+        unsigned int m_VertexArray;
+        std::unique_ptr<Shader> m_Shader;
+        std::unique_ptr<VertexBuffer> m_VertexBuffer;
+        std::unique_ptr<IndexBuffer> m_IndexBuffer;
     };
 
 
