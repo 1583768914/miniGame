@@ -23,6 +23,10 @@ namespace Hazel {
         m_Window = std::unique_ptr<Window>(Window::Create());
          // 1.2Application设置窗口事件的回调函数
         m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
+        
+        // 启用OpenGL混合功能，这对于ImGui窗口的半透明显示至关重要
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
         // 将ImGui层放在最后
         m_ImGuiLayer = new ImGuiLayer();
@@ -55,6 +59,61 @@ namespace Hazel {
         // 4. 设定顶点属性指针，来解释顶点缓冲中的顶点属性布局
         glEnableVertexAttribArray(0);// 开启glsl的layout = 0输入
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+        
+        // 注意：在现代OpenGL (>=3.0) 核心模式中必须使用着色器程序
+        // 下面是最简化的着色器实现
+        const char* vertexShaderSource = "#version 330 core\n" 
+                                        "layout (location = 0) in vec3 aPos;\n" 
+                                        "void main()\n" 
+                                        "{\n" 
+                                        "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n" 
+                                        "}\0";
+        
+        const char* fragmentShaderSource = "#version 330 core\n" 
+                                          "void main()\n" 
+                                          "{\n" 
+                                          "   gl_FragColor = vec4(1.0); // 使用默认白色（最简单的实现）\n" 
+                                          "}\0";
+        
+        // 编译和链接最简化的着色器程序
+        unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+        glCompileShader(vertexShader);
+        
+        // 检查顶点着色器编译错误
+        int success;
+        char infoLog[512];
+        glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+        if (!success) {
+            glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+            HZ_CORE_ERROR("顶点着色器编译失败: {0}", infoLog);
+        }
+        
+        unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+        glCompileShader(fragmentShader);
+        
+        // 检查片段着色器编译错误
+        glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+        if (!success) {
+            glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+            HZ_CORE_ERROR("片段着色器编译失败: {0}", infoLog);
+        }
+        
+        m_ShaderProgram = glCreateProgram();
+        glAttachShader(m_ShaderProgram, vertexShader);
+        glAttachShader(m_ShaderProgram, fragmentShader);
+        glLinkProgram(m_ShaderProgram);
+        
+        // 检查着色器程序链接错误
+        glGetProgramiv(m_ShaderProgram, GL_LINK_STATUS, &success);
+        if (!success) {
+            glGetProgramInfoLog(m_ShaderProgram, 512, NULL, infoLog);
+            HZ_CORE_ERROR("着色器程序链接失败: {0}", infoLog);
+        }
+        
+        glDeleteShader(vertexShader);
+        glDeleteShader(fragmentShader);
 	}
 
 	Application::~Application() {
@@ -98,6 +157,11 @@ namespace Hazel {
             glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
 
+            // 渲染三角形 - 在任何层更新和ImGui渲染之前
+            glUseProgram(m_ShaderProgram); // 激活着色器程序
+            glBindVertexArray(m_VertexArray);
+            glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
+            
             // 更新所有层
             for (Layer* layer : m_LayerStack)
                 layer->OnUpdate();
@@ -108,10 +172,6 @@ namespace Hazel {
             // 然后渲染所有层的ImGui内容
             for (Layer* layer : m_LayerStack)
                 layer->OnImGuiRender();
-            
-            // 渲染三角形 - 放在ImGui渲染之前
-            glBindVertexArray(m_VertexArray);
-            glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
             
             // 结束ImGui帧并渲染
             m_ImGuiLayer->End();

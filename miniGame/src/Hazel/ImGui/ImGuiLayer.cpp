@@ -26,23 +26,70 @@ namespace Hazel
         // io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
         // io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
+        // 设置ImGui字体 - 解决中文字符乱码问题
+        // 清空默认字体
+        io.Fonts->Clear();
+        
+        // 创建字体配置
+        ImFontConfig config;
+        config.OversampleH = 2;
+        config.OversampleV = 1;
+        config.PixelSnapH = true;
+        
+        // 定义字符范围，包含ASCII和中文字符
+        static const ImWchar ranges[] =
+        {
+            0x0020, 0x00FF, // 基本ASCII范围
+            0x4E00, 0x9FFF, // 常用中文字符范围
+            0,
+        };
+        
+        // 尝试加载Windows系统中的中文字体
+        bool fontLoaded = false;
+        
+        // 尝试加载多种可能的中文字体
+        if (!fontLoaded) {
+            fontLoaded = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\simhei.ttf", 16.0f, &config, ranges);
+        }
+        if (!fontLoaded) {
+            fontLoaded = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\simsun.ttc", 16.0f, &config, ranges);
+        }
+        if (!fontLoaded) {
+            fontLoaded = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\msyh.ttc", 16.0f, &config, ranges);
+        }
+        
+        // 如果没有找到中文字体，使用默认字体（可能仍会导致中文显示为问号）
+        if (!fontLoaded) {
+            io.Fonts->AddFontDefault();
+        }
+        
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
         // ImGui::StyleColorsClassic();
-        //  When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+        
+        // 配置ImGui样式使其窗口背景半透明
         ImGuiStyle &style = ImGui::GetStyle();
+        
+        // 使ImGui窗口背景半透明，这样后面渲染的三角形就能透过窗口背景显示出来
+        style.Colors[ImGuiCol_WindowBg].w = 0.8f; // 将alpha通道设置为0.8（半透明）
+        
+        // 当启用Viewports时的特殊设置
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {
             style.WindowRounding = 0.0f;
-            style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+            // 保留窗口背景的半透明设置
+            // style.Colors[ImGuiCol_WindowBg].w = 1.0f; // 不再设置为完全不透明
         }
 
         Application &app = Application::Get();
         GLFWwindow *window = static_cast<GLFWwindow *>(app.GetWindow().GetNativeWindow());
 
-        // Setup Platform/Renderer bindings
+        // Setup Platform/Renderer bindings - 使用与着色器相同的OpenGL版本
         ImGui_ImplGlfw_InitForOpenGL(window, true);
-        ImGui_ImplOpenGL3_Init("#version 410");
+        ImGui_ImplOpenGL3_Init("#version 330 core");
+        
+        // 重建字体纹理（必须在初始化OpenGL3后端之后调用）
+        ImGui_ImplOpenGL3_CreateFontsTexture();
     }
     void ImGuiLayer::OnDetach()
     {

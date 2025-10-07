@@ -41,6 +41,7 @@ namespace Hazel {
         static Application* s_Instance;
 
         unsigned int  m_VertexArray, m_VertexBuffer, m_IndexBuffer;
+        unsigned int  m_ShaderProgram; // 着色器程序ID
     };
 
 
