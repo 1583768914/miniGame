@@ -39,6 +39,8 @@ namespace Hazel {
         bool OnWindowClose(WindowClosedEvent& e); // 处理窗口关闭事件的函数
 
         static Application* s_Instance;
+
+        unsigned int  m_VertexArray, m_VertexBuffer, m_IndexBuffer;
     };
 
 
