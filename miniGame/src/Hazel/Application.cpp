@@ -83,7 +83,7 @@ namespace Hazel
             
         
         //3.先设置顶点缓冲布局-计算好各个属性所谓的值
-        m_VertexBuffer->SetLayout(layout);
+        vertexBuffer->SetLayout(layout);
 
         //4.再给顶点数组添加缓冲 设置各个属性的顶点属性指针
         m_VertexArray->AddVertexBuffer(vertexBuffer);
@@ -182,7 +182,8 @@ namespace Hazel
 
     Application::~Application()
     {
-        // m_Window是std::unique_ptr类型，会自动处理内存释放
+        // 确保ImGuiLayer被正确清理
+        // 注意：由于ImGuiLayer已经被添加到LayerStack，LayerStack的析构函数会负责释放
     }
 
     void Application::PushLayer(Layer *layer)
@@ -228,19 +229,28 @@ namespace Hazel
             glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
 
-            //绘制四边形
+            // 更新所有图层
+            for (auto& layer : m_LayerStack)
+                layer->OnUpdate();
+
+            // 绘制四边形
             m_BlueShader->Bind(); //绑定着色器
             m_SquareVA->Bind(); //顶点数组对象并且绘制
-
             glDrawElements(GL_TRIANGLES, m_SquareVA->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 
-
-            //绘制三角形
+            // 绘制三角形
             m_Shader->Bind(); //绑定着色器
-
             m_VertexArray->Bind(); //绑定顶点数组对象
-           
             glDrawElements(GL_TRIANGLES, m_VertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+
+            // 渲染ImGui
+            m_ImGuiLayer->Begin();
+            for (auto& layer : m_LayerStack)
+                layer->OnImGuiRender();
+            m_ImGuiLayer->End();
+
+            // 更新窗口 - 处理事件和交换缓冲区
+            m_Window->OnUpdate();
         }
     }
 } // namespace Hazel
