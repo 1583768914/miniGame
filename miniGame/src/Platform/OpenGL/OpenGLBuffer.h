@@ -10,7 +10,7 @@ namespace Hazel {
 	public:
 		
 		OpenGLVertexBuffer(float* vertices, uint32_t size);
-		virtual ~OpenGLVertexBuffer() {}
+		virtual ~OpenGLVertexBuffer();
 		virtual void Bind() const;
 		virtual void Unbind() const; 
 
@@ -25,7 +25,7 @@ namespace Hazel {
 		virtual ~OpenGLIndexBuffer();
 		virtual void Bind() const;
 		virtual void Unbind() const;
-		virtual uint32_t GetCout() const { return m_Count; }
+		virtual uint32_t GetCount() const { return m_Count; }
 
 	private:
 

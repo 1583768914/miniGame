@@ -8,6 +8,25 @@
 
 namespace Hazel
 {
+
+    static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type) {
+        switch (type) {
+        case Hazel::ShaderDataType::Float:    return GL_FLOAT;
+        case Hazel::ShaderDataType::Float2:   return GL_FLOAT;
+        case Hazel::ShaderDataType::Float3:   return GL_FLOAT;
+        case Hazel::ShaderDataType::Float4:   return GL_FLOAT;
+        case Hazel::ShaderDataType::Mat3:     return GL_FLOAT;
+        case Hazel::ShaderDataType::Mat4:     return GL_FLOAT;
+        case Hazel::ShaderDataType::Int:      return GL_INT;
+        case Hazel::ShaderDataType::Int2:     return GL_INT;
+        case Hazel::ShaderDataType::Int3:     return GL_INT;
+        case Hazel::ShaderDataType::Int4:     return GL_INT;
+        case Hazel::ShaderDataType::Bool:     return GL_BOOL;
+        }
+        return 0;
+    }
+
+
 // BIND_EVENT_FN宏定义 - 正确的成员函数绑定语法
 #define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
 
@@ -48,10 +67,32 @@ namespace Hazel
         glBindVertexArray(m_VertexArray);
 
         m_VertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
-   
+
+        //:临时的，会放在顶点数组抽象类中
+        uint32_t index = 0;
+
+        const auto& layout = m_VertexBuffer->GetLayout();
+
+        for (const auto& element :layout) {
+          
+            glEnableVertexAttribArray(index);
+
+            glVertexAttribPointer(index,
+                element.GetComponentCount(),
+                ShaderDataTypeToOpenGLBaseType(element.Type),
+                element.Normalized ? GL_TRUE : GL_FALSE,
+                layout.GetStride(),
+                (const void*)element.Offset);
+
+            index++;
+        }
+
+
+        m_IndexBuffer.reset(IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
+        
         // 4. 设定顶点属性指针，来解释顶点缓冲中的顶点属性布局
-        glEnableVertexAttribArray(0); // 开启glsl的layout = 0输入
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+        //glEnableVertexAttribArray(0); // 开启glsl的layout = 0输入
+        //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
 
         // 注意：在现代OpenGL (>=3.0) 核心模式中必须使用着色器程序
         // 下面是最简化的着色器实现
@@ -59,21 +100,25 @@ namespace Hazel
 			#version 330 core
 
 			layout(location = 0) in vec3 a_Position;
+			layout(location = 1) in vec4 a_Color;
 			out vec3 v_Position;
+			out vec4 v_Color;
 			void main()
 			{
 				v_Position = a_Position;
+				v_Color = a_Color;
 				gl_Position = vec4(a_Position, 1.0);	
 			}
 		)";
         std::string fragmentSrc = R"(
 			#version 330 core
-
 			layout(location = 0) out vec4 color;
 			in vec3 v_Position;
+			in vec4 v_Color;
 			void main()
 			{
 				color = vec4(v_Position * 0.5 + 0.5, 1.0);
+				color = v_Color;
 			}
 		)";
 

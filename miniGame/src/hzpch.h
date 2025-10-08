@@ -16,3 +16,6 @@
 #ifdef HZ_PLATFORM_WINDOWS
 #include <Windows.h>
 #endif
+
+// 包含Hazel核心头文件，使断言和日志宏在所有文件中可用
+#include "Hazel/Log.h"
