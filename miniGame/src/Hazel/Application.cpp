@@ -53,64 +53,51 @@ namespace Hazel
 
         // 使用OpenGL函数渲染一个三角形
         float vertices[3 * 7] = {
-       -0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
-       0.5f, -0.5f, 0.0f, 0.2f, 0.3f, 0.8f, 1.0f,
-       0.0f,  0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
+        -0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
+        0.5f, -0.5f, 0.0f, 0.2f, 0.3f, 0.8f, 1.0f,
+        0.0f,  0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
         };
+ 
 
 
         unsigned int indices[3] = {0, 1, 2}; // 索引数据
 
-        // 0.生成顶点数组对象VAO、顶点缓冲对象VBO、索引缓冲对象EBO
-        glGenVertexArrays(1, &m_VertexArray);
+        
+        //1.生成顶点数据
+        m_VertexArray.reset(VertexArray::Create());
 
+        //2.顶点缓冲
+        std::shared_ptr<VertexBuffer> vertexBuffer;
 
-        // 1. 绑定顶点数组对象
-        glBindVertexArray(m_VertexArray);
-
-        //2.1頂點緩衝
-        m_VertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
 
         // 2.1顶点缓冲
-        m_VertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
+        vertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
         ////////////////////////////////////////////////////////////////////////
         // 2.2 设定顶点属性指针，来解释顶点缓冲中的顶点属性布局/////////////////////////
         ////////////////////////////////////////////////////////////////////////
-        {
-            BufferLayout layout = {
+        
+        BufferLayout layout = {
                 { ShaderDataType::Float3, "a_Position" },
                 { ShaderDataType::Float4, "a_Color" }
-            };
-            m_VertexBuffer->SetLayout(layout);
-        }
-
-        //:临时的，会放在顶点数组抽象类中
-        uint32_t index = 0;
-
-        const auto& layout = m_VertexBuffer->GetLayout();
-
-        for (const auto& element :layout) {
-          
-            glEnableVertexAttribArray(index);
-
-            glVertexAttribPointer(index,
-                element.GetComponentCount(),
-                ShaderDataTypeToOpenGLBaseType(element.Type),
-                element.Normalized ? GL_TRUE : GL_FALSE,
-                layout.GetStride(),
-                (const void*)element.Offset);
-
-            index++;
-        }
-
-
-        m_IndexBuffer.reset(IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
+        };
+            
         
-        // 4. 设定顶点属性指针，来解释顶点缓冲中的顶点属性布局
-        //glEnableVertexAttribArray(0); // 开启glsl的layout = 0输入
-        //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+        //3.先设置顶点缓冲布局-计算好各个属性所谓的值
+        m_VertexBuffer->SetLayout(layout);
 
-        // 注意：在现代OpenGL (>=3.0) 核心模式中必须使用着色器程序
+        //4.再给顶点数组添加缓冲 设置各个属性的顶点属性指针
+        m_VertexArray->AddVertexBuffer(vertexBuffer);
+        
+        //5.索引缓冲
+        std::shared_ptr<IndexBuffer>indexBuffer;
+
+        indexBuffer.reset(IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
+
+        //6.给顶点数组设置索引缓冲
+        m_VertexArray->SetIndexBuffer(indexBuffer);
+
+
+        
         // 下面是最简化的着色器实现
         std::string vertexSrc = R"(
 			#version 330 core
@@ -140,48 +127,57 @@ namespace Hazel
 
          m_Shader.reset(new Shader(vertexSrc, fragmentSrc));
 
-        // 编译和链接最简化的着色器程序
-        // unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        // glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-        // glCompileShader(vertexShader);
 
-        // // 检查顶点着色器编译错误
-        // int success;
-        // char infoLog[512];
-        // glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-        // if (!success)
-        // {
-        //     glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        //     HZ_CORE_ERROR("顶点着色器编译失败: {0}", infoLog);
-        // }
-
-        // unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        // glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-        // glCompileShader(fragmentShader);
-
-        // // 检查片段着色器编译错误
-        // glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-        // if (!success)
-        // {
-        //     glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        //     HZ_CORE_ERROR("片段着色器编译失败: {0}", infoLog);
-        // }
-
-        // m_ShaderProgram = glCreateProgram();
-        // glAttachShader(m_ShaderProgram, vertexShader);
-        // glAttachShader(m_ShaderProgram, fragmentShader);
-        // glLinkProgram(m_ShaderProgram);
-
-        // // 检查着色器程序链接错误
-        // glGetProgramiv(m_ShaderProgram, GL_LINK_STATUS, &success);
-        // if (!success)
-        // {
-        //     glGetProgramInfoLog(m_ShaderProgram, 512, NULL, infoLog);
-        //     HZ_CORE_ERROR("着色器程序链接失败: {0}", infoLog);
-        // }
-
-        // glDeleteShader(vertexShader);
-        // glDeleteShader(fragmentShader);
+         
+         /*渲染一个quead所做的准备*/
+         // 渲染一个quad所做的准备
+        // 0.顶点数据
+         float squareVertices[3 * 4] = {
+             -0.75f, -0.75f, 0.0f,
+             0.75f, -0.75f, 0.0f,
+             0.75f,  0.75f, 0.0f,
+             -0.75f,  0.75f, 0.0f
+         };
+         uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 }; // 索引数据
+         // 1.生成顶点数组对象VAO
+         m_SquareVA.reset(VertexArray::Create());
+         // 2.顶点缓冲
+         std::shared_ptr<VertexBuffer> squareVB;
+         squareVB.reset(VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
+         // 设定顶点属性指针，来解释顶点缓冲中的顶点属性布局
+         BufferLayout layout2 = {
+             { ShaderDataType::Float3, "a_Position" }
+         };
+         // 3.先设置顶点缓冲布局-计算好各个属性的所需的值
+         squareVB->SetLayout(layout2);
+         // 4.再给顶点数组添加顶点缓冲-设置各个属性的顶点属性指针
+         m_SquareVA->AddVertexBuffer(squareVB);
+         // 5.索引缓冲
+         std::shared_ptr<IndexBuffer> squareIB;
+         squareIB.reset(IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
+         // 6.给顶点数组设置索引缓冲
+         m_SquareVA->SetIndexBuffer(squareIB);
+         // 着色器代码
+         std::string blueShaderVertexSrc = R"(
+			#version 330 core
+			layout(location = 0) in vec3 a_Position;
+			out vec3 v_Position;
+			void main()
+			{
+				v_Position = a_Position;
+				gl_Position = vec4(a_Position, 1.0);	
+			}
+		)";
+         std::string blueShaderFragmentSrc = R"(
+			#version 330 core
+			layout(location = 0) out vec4 color;
+			in vec3 v_Position;
+			void main()
+			{
+				color = vec4(0.2, 0.3, 0.8, 1.0);
+			}
+		)";
+         m_BlueShader.reset(new Shader(blueShaderVertexSrc, blueShaderFragmentSrc));
     }
 
     Application::~Application()
@@ -232,29 +228,19 @@ namespace Hazel
             glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
 
-            // 绑定着色器
-            m_Shader->Bind();
+            //绘制四边形
+            m_BlueShader->Bind(); //绑定着色器
+            m_SquareVA->Bind(); //顶点数组对象并且绘制
 
-            // 渲染三角形 - 在任何层更新和ImGui渲染之前
-            glBindVertexArray(m_VertexArray);
-            glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
+            glDrawElements(GL_TRIANGLES, m_SquareVA->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 
-            // 更新所有层
-            for (Layer *layer : m_LayerStack)
-                layer->OnUpdate();
 
-            // 开始ImGui帧
-            m_ImGuiLayer->Begin();
+            //绘制三角形
+            m_Shader->Bind(); //绑定着色器
 
-            // 然后渲染所有层的ImGui内容
-            for (Layer *layer : m_LayerStack)
-                layer->OnImGuiRender();
-
-            // 结束ImGui帧并渲染
-            m_ImGuiLayer->End();
-
-            // 最后更新窗口
-            m_Window->OnUpdate(); // 更新glfw
+            m_VertexArray->Bind(); //绑定顶点数组对象
+           
+            glDrawElements(GL_TRIANGLES, m_VertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
         }
     }
 } // namespace Hazel
