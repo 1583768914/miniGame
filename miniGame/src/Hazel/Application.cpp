@@ -52,10 +52,12 @@ namespace Hazel
         PushOverlay(m_ImGuiLayer);
 
         // 使用OpenGL函数渲染一个三角形
-        float vertices[3 * 3] = {
-            -0.5f, -0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            0.0f, 0.5f, 0.0f};
+        float vertices[3 * 7] = {
+       -0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
+       0.5f, -0.5f, 0.0f, 0.2f, 0.3f, 0.8f, 1.0f,
+       0.0f,  0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
+        };
+
 
         unsigned int indices[3] = {0, 1, 2}; // 索引数据
 
@@ -66,7 +68,21 @@ namespace Hazel
         // 1. 绑定顶点数组对象
         glBindVertexArray(m_VertexArray);
 
+        //2.1頂點緩衝
         m_VertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
+
+        // 2.1顶点缓冲
+        m_VertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
+        ////////////////////////////////////////////////////////////////////////
+        // 2.2 设定顶点属性指针，来解释顶点缓冲中的顶点属性布局/////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        {
+            BufferLayout layout = {
+                { ShaderDataType::Float3, "a_Position" },
+                { ShaderDataType::Float4, "a_Color" }
+            };
+            m_VertexBuffer->SetLayout(layout);
+        }
 
         //:临时的，会放在顶点数组抽象类中
         uint32_t index = 0;

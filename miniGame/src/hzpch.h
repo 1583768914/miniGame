@@ -1,5 +1,8 @@
 #pragma once
 
+// 禁用fmt库的Unicode支持，解决静态断言失败问题
+#define FMT_UNICODE 0
+
 
 #include <iostream>
 #include <memory>

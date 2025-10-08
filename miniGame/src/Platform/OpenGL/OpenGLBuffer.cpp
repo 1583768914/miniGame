@@ -7,21 +7,17 @@ namespace Hazel {
 
 	// VertexBuffer /////////////////////////////////////////////////////////////
 	OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, uint32_t size) {
-	   //1.„“½¨í”üc¾ĞnŒ¦Ïó
+		//1.ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½cï¿½ï¿½ï¿½nï¿½ï¿½ï¿½ï¿½
 		glCreateBuffers(1, &m_RendererID);
-	   //2.°ó¶¨¶¥µã»º³å¶ÔÏó
+		//2.ï¿½ó¶¨¶ï¿½ï¿½ã»ºï¿½ï¿½ï¿½ï¿½ï¿½
 		glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
 
-	    //3.°ÑÎÒÃÇµÄCPU¶¥µãÊı¾İ¸´ÖÆµ½GPU¶¥µã»º³åÖĞ¡£¹©OpenGLÊ¹ÓÃ
+		//3.ï¿½ï¿½ï¿½ï¿½ï¿½Çµï¿½CPUï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İ¸ï¿½ï¿½Æµï¿½GPUï¿½ï¿½ï¿½ã»ºï¿½ï¿½ï¿½Ğ¡ï¿½ï¿½ï¿½OpenGLÊ¹ï¿½ï¿½
 		glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
+		//4.åˆå§‹åŒ–BufferLayoutï¼ˆå¯ä»¥æ ¹æ®å®é™…éœ€æ±‚è®¾ç½®å…·ä½“çš„å¸ƒå±€ï¼‰
 	}
 
-	OpenGLVertexBuffer::~OpenGLVertexBuffer() {
-
-		glDeleteBuffers(1, &m_RendererID);
-	}
-
-	void  OpenGLVertexBuffer::Bind() const {
+	void OpenGLVertexBuffer::Bind() const {
 		glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
 	}
 
@@ -29,13 +25,20 @@ namespace Hazel {
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
+	OpenGLVertexBuffer::~OpenGLVertexBuffer() {
+
+		glDeleteBuffers(1, &m_RendererID);
+	}
+
+
+
 	// IndexBuffer //////////////////////////////////////////////////////////////
 	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count):m_Count(count) {
-		// 1.´´½¨¶¥µã»º³å¶ÔÏó
+		// 1.ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ã»ºï¿½ï¿½ï¿½ï¿½ï¿½
 		glCreateBuffers(1, &m_RendererID);
-		// 2.°ó¶¨¶¥µã»º³å¶ÔÏó
+		// 2.ï¿½ó¶¨¶ï¿½ï¿½ã»ºï¿½ï¿½ï¿½ï¿½ï¿½
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererID);
-		// 3. ¸´ÖÆÎÒÃÇµÄCPUµÄË÷ÒıÊı¾İµ½GPUË÷Òı»º³åÖĞ£¬¹©OpenGLÊ¹ÓÃ
+		// 3. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Çµï¿½CPUï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İµï¿½GPUï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ğ£ï¿½ï¿½ï¿½OpenGLÊ¹ï¿½ï¿½
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32_t), indices, GL_STATIC_DRAW);
 	}
 
